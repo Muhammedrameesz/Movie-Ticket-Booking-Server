@@ -37,7 +37,11 @@ const adminSignup = async (req, res) => {
     if (!token) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    res.cookie("adminToken", token);
+    res.cookie("adminToken", token, {
+      httpOnly: true,      
+      secure: true,        
+      sameSite: 'None',    
+    });
     res.status(201).json({ message: `${role} created successfully `});
   } catch (error) {
     console.error(error);
@@ -62,7 +66,11 @@ const adminLogin = async (req, res) => {
     }
     const token = GenerateAdminToken(email);
 
-    res.cookie("adminToken", token);
+    res.cookie("adminToken", token, {
+      httpOnly: true,      
+      secure: true,        
+      sameSite: 'None',    
+    });
     res.status(200).json({ message: "Login successful" });
   } catch (error) {
     console.error(error);

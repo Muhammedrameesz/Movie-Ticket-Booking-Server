@@ -32,9 +32,9 @@ const userSignup = async (req, res) => {
     }
 
     res.cookie("userToken", token, {
-      httpOnly: true,      // Accessible only by the web server
-      secure: true,        // Ensure this is true for HTTPS
-      sameSite: 'None',    // Required for cross-origin requests
+      httpOnly: true,      
+      secure: true,        
+      sameSite: 'None',    
     });
     
     res.status(200).json({ message: "User created successfully" });
@@ -61,9 +61,9 @@ const userLogin = async (req, res) => {
     }
     const token = GenerateUserToken(email);
     res.cookie("userToken", token, {
-      httpOnly: true,      // Accessible only by the web server
-      secure: true,        // Ensure this is true for HTTPS
-      sameSite: 'None',    // Required for cross-origin requests
+      httpOnly: true,      
+      secure: true,        
+      sameSite: 'None',    
     });
     
     res.status(200).json({ message: "Login successful", token });
