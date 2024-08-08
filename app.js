@@ -13,7 +13,7 @@ const router = require("./routes");
 
 app.use(
   cors({
-    origin: "*",
+    origin: ["https://movie-ticket-booking-user.netlify.app", "http://localhost:5174"],
     credentials: true,
   })
 );
