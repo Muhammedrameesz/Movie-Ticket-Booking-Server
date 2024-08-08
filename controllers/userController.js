@@ -31,7 +31,12 @@ const userSignup = async (req, res) => {
       return res.status(500).json({ message: "Internal Server Error" });
     }
 
-    res.cookie("userToken", token);
+    res.cookie("userToken", token, {
+      httpOnly: true,      // Accessible only by the web server
+      secure: true,        // Ensure this is true for HTTPS
+      sameSite: 'None',    // Required for cross-origin requests
+    });
+    
     res.status(200).json({ message: "User created successfully" });
   } catch (error) {
     console.error(error);
@@ -55,7 +60,12 @@ const userLogin = async (req, res) => {
       return res.status(401).json({ message: "passoword not match" });
     }
     const token = GenerateUserToken(email);
-    res.cookie("userToken", token);
+    res.cookie("userToken", token, {
+      httpOnly: true,      // Accessible only by the web server
+      secure: true,        // Ensure this is true for HTTPS
+      sameSite: 'None',    // Required for cross-origin requests
+    });
+    
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.error(error);
