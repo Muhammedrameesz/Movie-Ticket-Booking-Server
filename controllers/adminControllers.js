@@ -101,8 +101,7 @@ const verifyAdmin = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-export const Logout = async (req, res) => {  
+ const adminLogout = async (req, res) => {  
   try {
       // Retrieve the token from cookies (for logging or verification purposes)
       const adminToken = req.cookies.adminToken; 
