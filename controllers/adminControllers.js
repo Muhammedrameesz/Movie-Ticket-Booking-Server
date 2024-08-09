@@ -2,6 +2,8 @@ const Admin = require("../model/adminSchema");
 const bcrypt = require("bcrypt");
 const { GenerateAdminToken } = require("../utils/adminToken");
 
+
+
 //    admin signup
 const adminSignup = async (req, res) => {
   try {
@@ -99,8 +101,19 @@ const verifyAdmin = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+const adminLogout = async(req,res)=>{
+  try {
+    res.clearCookie("adminToken");
+    res.status(200).json({ message: "Logged Out successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+ };
 module.exports = {
   adminSignup,
   adminLogin,
   verifyAdmin,
+  adminLogout,
 };
