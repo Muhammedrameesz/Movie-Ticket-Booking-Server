@@ -102,15 +102,22 @@ const verifyAdmin = async (req, res) => {
   }
 };
 
-const adminLogout = async(req,res)=>{
+const adminLogout = async (req, res) => {
   try {
-    res.clearCookie("adminToken");
+    res.clearCookie("adminToken", {
+      httpOnly: true,
+      secure: true,  
+      sameSite: "none", 
+      domain: "movie-ticket-booking-server.onrender.com", 
+      path: "/"
+    });
     res.status(200).json({ message: "Logged Out successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
- };
+};
+
 module.exports = {
   adminSignup,
   adminLogin,
