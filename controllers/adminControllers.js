@@ -102,21 +102,26 @@ const verifyAdmin = async (req, res) => {
   }
 };
 
-const adminLogout = async (req, res) => {
+export const Logout = async (req, res) => {  
   try {
-    res.clearCookie("adminToken", {
-      httpOnly: true,
-      secure: true,  
-      sameSite: "none", 
-      domain: "movie-ticket-booking-server.onrender.com", 
-      path: "/"
-    });
-    res.status(200).json({ message: "Logged Out successfully" });
+      // Retrieve the token from cookies (for logging or verification purposes)
+      const adminToken = req.cookies.adminToken; 
+      
+      // Clear the token cookie
+      res.cookie('adminToken', '', {
+          maxAge: 0, // Set cookie's max age to 0, which effectively removes it
+          httpOnly: true, // Cookie cannot be accessed via JavaScript
+          sameSite: "none", // Allows the cookie to be sent in cross-origin requests
+          secure: true, // Adjust based on your environment or requirements
+      });
+
+      res.status(200).json({ message: 'Logged out successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+      console.error('Error logging out:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 module.exports = {
   adminSignup,
