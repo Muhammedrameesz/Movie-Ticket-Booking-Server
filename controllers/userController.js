@@ -94,8 +94,25 @@ const verifyUser = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+const userLogout = async (req, res) => {  
+  try {
+      const adminToken = req.cookies.userToken; 
+      res.cookie('userToken', '', {
+          maxAge: 0, 
+          httpOnly: true, 
+          sameSite: "none", 
+          secure: true, 
+      });
+
+      res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+      console.error('Error logging out:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 module.exports = {
   userSignup,
   userLogin,
   verifyUser,
+  userLogout,
 };

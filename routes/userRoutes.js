@@ -1,7 +1,7 @@
-const {  userSignup, userLogin,verifyUser} =require('../controllers/userController')
+const {  userSignup, userLogin,verifyUser,userLogout} =require('../controllers/userController')
 const{  VerifyUserToken}= require('../utils/userToken')
 const userRouter = require('express').Router()
-// const verifyGtoken = require('../google/googleTokenVerify')
+
 
 
 
@@ -9,6 +9,7 @@ const userRouter = require('express').Router()
 userRouter.post('/signup',userSignup)
 userRouter.post('/login',userLogin)
 userRouter.get('/verifyUser', VerifyUserToken, verifyUser) 
-// userRouter.post('/googleLogin', verifyGtoken) 
+userRouter.post('/logout', userLogout)  
+
 
 module.exports = userRouter
