@@ -64,7 +64,7 @@ const adminLogin = async (req, res) => {
 
     const Verifypassword = await bcrypt.compare(password, adminExist.password);
     if (!Verifypassword) {
-      return res.status(401).json({ message: "passoword not match" });
+      return res.status(401).json({ message: "password not match" });
     }
     const token = GenerateAdminToken(email);
 
