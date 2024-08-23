@@ -96,7 +96,7 @@ const verifyUser = async (req, res) => {
 };
 const userLogout = async (req, res) => {  
   try {
-      const adminToken = req.cookies.userToken; 
+      const userToken = req.cookies.userToken; 
       res.cookie('userToken', '', {
           maxAge: 0, 
           httpOnly: true, 
