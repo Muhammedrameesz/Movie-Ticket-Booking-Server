@@ -98,5 +98,38 @@ const cancelRequst = async(req,res)=>{
  }
     
  }
+ const updateCancelBookings = async (req, res) => {
+    try {
+     console.log('bb',req.body);
+      const {canceledOrderId}  = req.body; 
+      if (!canceledOrderId) {
+        console.log('Cancellation order ID not provided');
+        return res.status(400).json({ message: 'Cancellation order ID not provided' });
+      }
+  
+     
+      const canceledOrderExist = await cancelBookingSchema.findById(canceledOrderId);
+      if (!canceledOrderExist) {
+        console.log('No cancellations found');
+        return res.status(404).json({ message: 'No cancellation request found' });
+      }
+  
+      const updatedCancellationOrder = await cancelBookingSchema.updateOne(
+        { _id: canceledOrderId },
+        { $set: { status: 'Cancellation confirmed' } }
+      );
+  
+      if (updatedCancellationOrder.nModified === 0) {
+        console.log('Error confirming this booking');
+        return res.status(403).json({ message: 'Error confirming this booking' });
+      }
+  
+      return res.status(200).json({ message: 'Cancellation confirmed successfully' });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
 
-module.exports ={cancelRequst,getCancelRequestsForUser,getCanceleationForAdmin}
+module.exports ={cancelRequst,getCancelRequestsForUser,getCanceleationForAdmin,updateCancelBookings}
