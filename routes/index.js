@@ -7,6 +7,7 @@ const theatersRouter = require("./theaterRoutes")
 const showRouter = require("./showRoutes")
 const paymentRouter = require("./paymentRoutes")
 const getBookingRoter = require('./getBookingRoutes')
+const cancelBookingRouter = require('./cancelRequests')
 
 
 router.use('/admins', adminRouter)
@@ -17,6 +18,8 @@ router.use('/theaters', theatersRouter)
 router.use('/shows', showRouter)
 router.use('/payments', paymentRouter)
 router.use('/getBooking', getBookingRoter)
+router.use('/cancel',cancelBookingRouter)
+
 
 
 module.exports = router;
