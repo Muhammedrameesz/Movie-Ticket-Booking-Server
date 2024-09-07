@@ -42,7 +42,7 @@ const cancelRequst = async(req,res)=>{
     }
 }
 
-const getCancelRequestsForUser = async(req,res)=>{
+   const getCancelRequestsForUser = async(req,res)=>{
     try {
        
            const user=req.user
@@ -70,4 +70,33 @@ const getCancelRequestsForUser = async(req,res)=>{
     }
  }
 
-module.exports ={cancelRequst,getCancelRequestsForUser}
+ const getCanceleationForAdmin = async(req,res)=>{
+    try {
+       
+        const owner=req.admin
+        if(!owner){
+         console.log('invalid credencials');
+         res.status(403).json({message:'credencials'})
+        }
+        const ownerExist = await adminSchema.findOne({email:owner})
+        if(!ownerExist){
+         console.log('cant find owner');
+         res.status(404).json({message:'cant find owner'})
+        }
+        const  ownerId = ownerExist._id
+
+        const ownerCancellationBookings = await cancelBookingSchema.find({ownerId:ownerId})
+        if(!ownerCancellationBookings){
+         console.log('ownerCancellation not found');
+         res.status(404).json({message:'ownerCancellation not found'})
+        }
+        res.status(200).json(ownerCancellationBookings)
+
+   } catch (error) {
+      console.log(error);
+      res.status(500).json({message:'internal server error'})
+ }
+    
+ }
+
+module.exports ={cancelRequst,getCancelRequestsForUser,getCanceleationForAdmin}

@@ -14,6 +14,7 @@ const cancelRequestsSchema = new mongoose.Schema({
   paymentDate: { type: Date, required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  status:{type:String,default:'Cancel Requested'}
 });
 
 const cancelRequests = new mongoose.model('cancelBookingRequest',cancelRequestsSchema)
