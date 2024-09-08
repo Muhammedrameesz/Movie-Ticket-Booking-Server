@@ -2,6 +2,7 @@ const cancelBookingSchema = require('../model/cancelBookingRequests')
 const theaterSchema = require('../model/theaterScema')
 const adminSchema = require('../model/adminSchema')
 const userSchema = require('../model/userSchema')
+const bookingSchema = require('../model/paymentSchema')
 
 const cancelRequst = async(req,res)=>{
     try {
@@ -130,6 +131,34 @@ const cancelRequst = async(req,res)=>{
       return res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+  const deleteBookings = async(req,res)=>{
+    try {
+       const{cancel,booking,user}=req.body
+        if(!cancel || !booking || !user){
+          console.log('incompleted fields');
+          return res.status(400).json({message:'incompleted fields'})
+        }
+        const deleteBooking = await bookingSchema.findOneAndDelete({
+          _id:booking,
+          userId:user
+        })
+        if(!deleteBooking){
+          console.log('not deleted');
+          res.status(404).json({message:'Failed to delete booking'})
+        }
+  
+        const deleteCanceled = await cancelBookingSchema.findByIdAndDelete(cancel)
+        if(!deleteCanceled){
+          console.log('failed to delete cancel request');
+          res.status(404).json({message:'failed to delete cancel request'})
+        }
+       res.status(200).json({message:'Cancellation Confirmed'})
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({message:'internal server error'})
+    }
+   }
   
 
-module.exports ={cancelRequst,getCancelRequestsForUser,getCanceleationForAdmin,updateCancelBookings}
+module.exports ={cancelRequst,getCancelRequestsForUser,getCanceleationForAdmin,updateCancelBookings,deleteBookings}
