@@ -155,6 +155,23 @@ const getAllOwners = async (req, res) => {
     res.status(500).json({message: "Internal server error",  error: error.message, });
   }
 };
+const verifyAdminAndOwner = async (req, res) => {
+  try {
+    const email = req.admin;
+    if (!email) {
+      return res.status(401).json({ message: "Admin not authenticated" });
+    }
+    const adminExist = await Admin.findOne({ email: email });
+    if (!adminExist) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+    const roleCheck = adminExist.role
+    res.status(200).json({ message: "Admin verified successfully" ,data:roleCheck});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 
 module.exports = {
@@ -162,5 +179,6 @@ module.exports = {
   adminLogin,
   verifyAdmin,
   adminLogout,
-  getAllOwners
+  getAllOwners,
+  verifyAdminAndOwner
 };
