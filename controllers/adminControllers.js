@@ -1,7 +1,7 @@
 const Admin = require("../model/adminSchema");
 const bcrypt = require("bcrypt");
 const { GenerateAdminToken } = require("../utils/adminToken");
-
+const TeaterSchema = require("../model/theaterScema");
 
 
 //    admin signup
@@ -117,6 +117,44 @@ const verifyAdmin = async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+const getAllOwners = async (req, res) => {
+  try {
+    const owners = await Admin.find({ role: "owner", status: "active" });
+    if (owners.length === 0) {
+      return res.status(404).json({ message: "No owners found" });
+    }
+    const ownerIds = owners.map((owner) => owner._id);
+    const theatersWithOwnerIds = await TeaterSchema.find({ owner: { $in: ownerIds } });
+    if (theatersWithOwnerIds.length === 0) {
+      return res.status(404).json({ message: "No theaters found for the provided owners" });
+    }
+    const combinedData = theatersWithOwnerIds.map((theater) => {
+      const owner = owners.find((owner) => owner._id.equals(theater.owner));
+      if (!owner) {
+        return {
+          theaterName: theater.name,
+          theaterLocation: theater.address,
+          theaterContact: theater.contact,
+          owner: "Owner details not found", 
+        };
+      }
+      return {
+        theaterName: theater.name,
+        theaterLocation: theater.address,
+        theaterContact: theater.contact,
+        ownerId: owner._id,
+        ownerFirstName: owner.firstName,
+        ownerLastName: owner.lastName,
+        ownerEmail: owner.email,
+        createdAt: owner.createdAt,
+      };
+    });
+    res.status(200).json({ message: "Request successful", data: combinedData,});
+  } catch (error) {
+    console.error("Error fetching owners or theaters:", error);
+    res.status(500).json({message: "Internal server error",  error: error.message, });
+  }
+};
 
 
 module.exports = {
@@ -124,4 +162,5 @@ module.exports = {
   adminLogin,
   verifyAdmin,
   adminLogout,
+  getAllOwners
 };
