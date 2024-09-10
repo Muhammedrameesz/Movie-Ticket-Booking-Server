@@ -3,6 +3,8 @@ const theaterSchema = require('../model/theaterScema')
 const adminSchema = require('../model/adminSchema')
 const userSchema = require('../model/userSchema')
 const bookingSchema = require('../model/paymentSchema')
+const canceledSeats = require("../model/canceledSeats")
+const MovieSchema = require("../model/movieSchema")
 
 const cancelRequst = async(req,res)=>{
     try {
@@ -99,6 +101,7 @@ const cancelRequst = async(req,res)=>{
  }
     
  }
+
  const updateCancelBookings = async (req, res) => {
     try {
      console.log('bb',req.body);
@@ -133,32 +136,96 @@ const cancelRequst = async(req,res)=>{
   };
 
   const deleteBookings = async(req,res)=>{
-    try {
-       const{cancel,booking,user}=req.body
-        if(!cancel || !booking || !user){
-          console.log('incompleted fields');
-          return res.status(400).json({message:'incompleted fields'})
+  try {
+     const{cancel,booking,user}=req.body
+      if(!cancel || !booking || !user){
+        console.log('incompleted fields');
+        return res.status(400).json({message:'incompleted fields'})
+      }
+      const deleteBooking = await bookingSchema.findOneAndDelete({
+        _id:booking,
+        userId:user
+      })
+      if(!deleteBooking){
+        console.log('not deleted');
+        res.status(404).json({message:'Failed to delete booking'})
+      }
+        const cancelProgress = await cancelBookingSchema.findById(cancel)
+        const newCanceleedSeats = new canceledSeats({
+          theaterName:cancelProgress.theaterName,
+          movieName:cancelProgress.movieName,
+          bookingDate:cancelProgress.date,
+          seatNumbers:cancelProgress.seetNumbers,
+          bookingTime:cancelProgress.time
+        }) 
+        if(!newCanceleedSeats){
+          console.log('failed to create seatsRemove model');
+        res.status(404).json({message:'failed to create seatsRemove model'})
         }
-        const deleteBooking = await bookingSchema.findOneAndDelete({
-          _id:booking,
-          userId:user
-        })
-        if(!deleteBooking){
-          console.log('not deleted');
-          res.status(404).json({message:'Failed to delete booking'})
-        }
-  
-        const deleteCanceled = await cancelBookingSchema.findByIdAndDelete(cancel)
-        if(!deleteCanceled){
-          console.log('failed to delete cancel request');
-          res.status(404).json({message:'failed to delete cancel request'})
-        }
-       res.status(200).json({message:'Cancellation Confirmed'})
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({message:'internal server error'})
+        await newCanceleedSeats.save()
+       const deleteCanceled = await cancelBookingSchema.findByIdAndDelete(cancel)
+       if(!deleteCanceled){
+        console.log('failed to delete cancel request');
+        res.status(404).json({message:'failed to delete cancel request'})
+      }
+     res.status(200).json({message:'Cancellation Confirmed'})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message:'internal server error'})
+  }
+ }
+
+ const getCanceleSeats = async (req, res) => {
+  try {
+    const seats = await canceledSeats.find();
+    if (seats.length === 0) { 
+      return res.status(404).json({ message: 'No canceled seats found' });
     }
-   }
+    const seatsWithMovieId = await Promise.all(seats.map(async (seat) => {
+      const movie = await MovieSchema.findOne({ title: seat.movieName });
+      if (!movie) {
+        throw new Error(`Movie with title ${seat.movieName} not found`);
+      }
+      return {
+        ...seat.toObject(),
+        movieId: movie._id
+      };
+    }));
+
+    res.status(200).json({ message: 'Get success', data: seatsWithMovieId });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const clearCanceledSeats = async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      console.log('No ID provided');
+      return res.status(400).json({ message: 'ID is required' });
+    }
+    const clearSeats = await canceledSeats.findByIdAndDelete(id);
+
+    if (!clearSeats) {
+      console.log('Seats Not Cleared: No seat found with ID', id);
+      return res.status(404).json({ message: 'Seats not found' });
+    }
+    res.status(200).json({ message: 'Seats cleared successfully' });
+  } catch (error) {
+    console.error('Error clearing seats:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
   
 
-module.exports ={cancelRequst,getCancelRequestsForUser,getCanceleationForAdmin,updateCancelBookings,deleteBookings}
+module.exports ={
+  cancelRequst,
+  getCancelRequestsForUser,
+  getCanceleationForAdmin,
+  updateCancelBookings,
+  deleteBookings,
+  getCanceleSeats,
+  clearCanceledSeats
+}
